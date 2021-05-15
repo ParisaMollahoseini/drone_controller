@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Drone_openGL</string>
+    <string name="not_available">Not available</string>
+    <string name="roll">Roll:</string>
+    <string name="pitch">Pitch:</string>
+    <string name="yaw">Yaw:</string>
+</resources>

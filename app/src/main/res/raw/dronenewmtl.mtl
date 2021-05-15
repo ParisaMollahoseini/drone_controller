@@ -1,0 +1,29 @@
+newmtl SquarePlane1
+Kd 0.000 0.000 0.000
+d 1.000
+newmtl SquarePlane2
+Kd 0.000 0.000 0.000
+d 1.000
+newmtl SquarePlane3
+Kd 0.000 0.000 0.000
+d 1.000
+newmtl SquarePlane4
+Kd 0.000 0.000 0.000
+d 1.000
+newmtl Cylinder
+Kd 1.000 1.000 1.000
+d 1.000
+newmtl Tube1
+Kd 0.000 0.082 1.000
+d 1.000
+newmtl Tube2
+Kd 1.000 0.000 0.000
+d 1.000
+
+newmtl Tube3
+Kd 1.000 0.000 0.000
+d 1.000
+
+newmtl Tube4
+Kd 0.000 0.082 1.000
+d 1.000

@@ -1,0 +1,45 @@
+newmtl Cone
+Kd 0.941 0.000 0.000
+d 1.000
+newmtl Cone
+Kd 1.000 0.000 0.000
+d 1.000
+newmtl Cone
+Kd 1.000 0.000 0.000
+d 1.000
+newmtl Cone
+Kd 1.000 0.000 0.000
+d 1.000
+newmtl Cone
+Kd 0.000 0.082 1.000
+d 1.000
+newmtl Cone
+Kd 0.000 0.082 1.000
+d 1.000
+newmtl Cone
+Kd 0.000 0.082 1.000
+d 1.000
+newmtl Tube
+Kd 1.000 0.000 0.000
+d 1.000
+newmtl Tube
+Kd 1.000 0.000 0.000
+d 1.000
+newmtl Tube
+Kd 0.000 0.082 1.000
+d 1.000
+newmtl Tube
+Kd 0.000 0.082 1.000
+d 1.000
+newmtl Sphere
+Kd 1.000 1.000 1.000
+d 1.000
+newmtl Box
+Kd 1.000 1.000 1.000
+d 1.000
+newmtl Cone
+Kd 0.000 0.082 1.000
+d 1.000
+newmtl Box
+Kd 1.000 1.000 1.000
+d 1.000
