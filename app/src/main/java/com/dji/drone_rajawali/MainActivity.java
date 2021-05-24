@@ -517,7 +517,7 @@ public class MainActivity extends AppCompatActivity {
 
                     // Normalize the rotation vector if it's big enough to get the axis
                     if (omegaMagnitude_joy_left > EPSILON) {
-                        axisX /= omegaMagnitude_joy_left;
+                        axisX = axisX / omegaMagnitude_joy_left;
                     }
 
                     // Integrate around this axis with the angular speed by the time step

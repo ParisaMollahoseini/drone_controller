@@ -168,11 +168,19 @@ public class Renderer extends RajawaliRenderer {
         else
             return zvect;
     }
+
     public void rotate_degree(double x,double y,double z)
     {
+
         getObj().rotate(getline(0),x);
         getObj().rotate(getline(1),y);
         getObj().rotate(getline(2),z);
+
+        zline.rotateAround(getline(0),x);
+        xline.rotateAround(getline(2),z);
+        yline.rotateAround(getline(0),x);
+        yline.rotateAround(getline(2),z);
+
 
     }
     public void Rotate_begin(Quaternion quat){
@@ -181,6 +189,12 @@ public class Renderer extends RajawaliRenderer {
         if(mSceneInitialized) {
 
             getObj().setOrientation(quat);
+
+            Quaternion q = new Quaternion(1,0,0,0);
+
+            xline.setOrientation(q);
+            yline.setOrientation(q);
+            zline.setOrientation(q);
         }
     }
     public void onTouchEvent(MotionEvent event){
