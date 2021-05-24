@@ -31,6 +31,8 @@ public class Renderer extends RajawaliRenderer {
     private Object3D obj;
     private Line3D xline,yline,zline;
 
+    private double final_x=0,final_z=0;
+
     public Renderer(Context context) {
         super(context);
         this.context = context;
@@ -142,6 +144,7 @@ public class Renderer extends RajawaliRenderer {
         //Toast.makeText(this.context,"screen is "+mSceneInitialized,Toast.LENGTH_SHORT).show();
 
         if(mSceneInitialized){
+
             Matrix4 m4 = new Matrix4();
             Vector3 vx = new Vector3(deltaRotationVector[0],deltaRotationVector[3],
                     deltaRotationVector[6]);
@@ -151,8 +154,12 @@ public class Renderer extends RajawaliRenderer {
                     deltaRotationVector[8]);
             m4.setAll(vx,vy,vz,Vector3.ZERO);
             getObj().rotate(m4);
+            xline.rotate(m4);
+            yline.rotate(m4);
+            zline.rotate(m4);
 
-            Log.d("matrix:::::::::::::::\n",m4.toString());
+
+            Log.d("\nmatrix:::::::::::::::\n",m4.toString());
             //getCurrentCamera().rotate(m4);
             //getCurrentScene().getCamera().rotate(m4);
 
@@ -184,6 +191,8 @@ public class Renderer extends RajawaliRenderer {
         yline.rotateAround(getline(0),x);
         yline.rotateAround(getline(2),z);
 
+        final_x += x;
+        final_z += z;
 
 
     }
@@ -191,14 +200,27 @@ public class Renderer extends RajawaliRenderer {
 
 
         if(mSceneInitialized) {
+/////////////////////////////////////////////////////////////////////////////////////
+            double w = Math.cos(Math.toRadians(Math.toDegrees(yline.getRotY())));
+            double y = Math.sin(Math.toRadians(Math.toDegrees(yline.getRotY())));
 
-            getObj().setOrientation(quat);
+            Quaternion q2 = new Quaternion(w,0,y,0);
+
+            getObj().setOrientation(q2);
+            //getObj().rotate(Vector3.Axis.Y,Math.toDegrees(yline.getRotY()));
+            Log.d("\nOrientation:::::::\n",q2.toString());
+
 
             Quaternion q = new Quaternion(1,0,0,0);
 
             xline.setOrientation(q);
             yline.setOrientation(q);
             zline.setOrientation(q);
+
+
+            final_x = 0;
+            final_z = 0;
+/////////////////////////////////////////////////////////////////////////////////////
         }
     }
     public void onTouchEvent(MotionEvent event){

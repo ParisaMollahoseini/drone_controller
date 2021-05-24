@@ -479,12 +479,6 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onTouch(final MotionEvent pEvent,OnScreenJoystick joystick, float pX, float pY) {
-            if (pEvent.getAction() == MotionEvent.ACTION_UP) {//when joystick is clicked
-                Quaternion q = new Quaternion(Math.sqrt(2)/2,0,Math.sqrt(2)/2,0);
-
-                renderer.Rotate_begin(q);
-
-            }else {
 
 
                     d_new_y = joystick_left.distance_base(pEvent.getX());
@@ -550,7 +544,7 @@ public class MainActivity extends AppCompatActivity {
                         pwm_y = 2000 + (joystick.getStrength() * Math.abs(Math.cos(Math.toRadians(joystick.getAngle()))) * 500);
                     }
 
-                }
+
 
 
         }
