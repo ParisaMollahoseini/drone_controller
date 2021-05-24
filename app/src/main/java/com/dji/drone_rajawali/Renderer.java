@@ -3,6 +3,7 @@ package com.dji.drone_rajawali;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.Toast;
 
@@ -150,6 +151,8 @@ public class Renderer extends RajawaliRenderer {
                     deltaRotationVector[8]);
             m4.setAll(vx,vy,vz,Vector3.ZERO);
             getObj().rotate(m4);
+
+            Log.d("matrix:::::::::::::::\n",m4.toString());
             //getCurrentCamera().rotate(m4);
             //getCurrentScene().getCamera().rotate(m4);
 
@@ -180,6 +183,7 @@ public class Renderer extends RajawaliRenderer {
         xline.rotateAround(getline(2),z);
         yline.rotateAround(getline(0),x);
         yline.rotateAround(getline(2),z);
+
 
 
     }
