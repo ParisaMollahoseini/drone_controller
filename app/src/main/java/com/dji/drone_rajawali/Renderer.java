@@ -3,6 +3,7 @@ package com.dji.drone_rajawali;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.renderscript.Matrix3f;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.Toast;
@@ -14,6 +15,7 @@ import org.rajawali3d.loader.LoaderOBJ;
 import org.rajawali3d.loader.ParsingException;
 import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.methods.DiffuseMethod;
+import org.rajawali3d.math.Matrix;
 import org.rajawali3d.math.Matrix4;
 import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector3;
@@ -78,7 +80,7 @@ public class Renderer extends RajawaliRenderer {
             getCurrentScene().addChild(obj);//add obj to screen
             //x axis
             Stack<Vector3> points = new Stack<>();
-            points.push(new Vector3(-10,0,0));
+            points.push(new Vector3(-5,0,0));
             points.push(new Vector3(5,0,0));
             points.push(new Vector3(4.75,0,-0.5));
             points.push(new Vector3(4.75,0,0.5));
@@ -196,26 +198,20 @@ public class Renderer extends RajawaliRenderer {
 
 
     }
-    public void Rotate_begin(Quaternion quat){
+    public void Rotate_begin(){
 
 
         if(mSceneInitialized) {
 /////////////////////////////////////////////////////////////////////////////////////
-            double w = Math.cos(Math.toRadians(Math.toDegrees(yline.getRotY())));
-            double y = Math.sin(Math.toRadians(Math.toDegrees(yline.getRotY())));
 
-            Quaternion q2 = new Quaternion(w,0,y,0);
-
-            getObj().setOrientation(q2);
-            //getObj().rotate(Vector3.Axis.Y,Math.toDegrees(yline.getRotY()));
-            Log.d("\nOrientation:::::::\n",q2.toString());
-
-
+            //Quaternion q_obj = new Quaternion(Math.sqrt(2)/2,0,Math.sqrt(2)/2,0);
             Quaternion q = new Quaternion(1,0,0,0);
 
+            getObj().setOrientation(q);
             xline.setOrientation(q);
             yline.setOrientation(q);
             zline.setOrientation(q);
+
 
 
             final_x = 0;

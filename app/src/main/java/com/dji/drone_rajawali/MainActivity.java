@@ -11,7 +11,9 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -29,18 +31,23 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.GridLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.postprocessing.passes.BlurPass;
 import org.rajawali3d.surface.IRajawaliSurface;
 import org.rajawali3d.surface.RajawaliSurfaceView;
 import org.rajawali3d.surface.RajawaliTextureView;
+
+import java.util.Arrays;
 
 import static androidx.vectordrawable.graphics.drawable.PathInterpolatorCompat.EPSILON;
 import static java.lang.Math.sqrt;
@@ -54,14 +61,29 @@ public class MainActivity extends AppCompatActivity {
 
     ProgressBar bar;
 
+    //save yaw
+    float[][] yawRotationMatrix_save = {{1,0,0},{0,1,0},{0,0,1}};
+
+    //save yaw
+
+    //thread
+    myThread thread_main=new myThread();
+    //thread
+
     Renderer renderer;
-    int flag = 0;
+    int flag = 0,flag_check_direction=0;
+
+    //// left joystick
+    int resume_left_joystick = 0;
+    MotionEvent pEvent_left ;
+    float pX_left, pY_left;
+    //// left joystick
 
     double pwm_x,pwm_y,pwm_z;//1500 to 2500
 
     double prev_Vx,prev_Vz;
     float prev_x_1=0,prev_y_1=0,prev_x_2=0,prev_y_2=0,flag_first_1=1,flag_first_2=1;
-    float d_new_y=0,d_prev_y=0;
+
     TextView t1,t11,t111,t2,t22,t222,t1_right,t11_right,t111_right,t2_right,t22_right,t222_right;//for roll , pitch , yaw
     //control sensor
     SensorManager sensorManager;
@@ -76,6 +98,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+        //thread
+        thread_main.start();
+        //thread
         //gyroscope
         PackageManager packageManager = getPackageManager();
         boolean gyroExists = packageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_GYROSCOPE);
@@ -101,9 +127,18 @@ public class MainActivity extends AppCompatActivity {
         Typeface typeface = ResourcesCompat.getFont(getBaseContext(), R.font.no54);
         //font
         //build ui
+        RelativeLayout relParent_main = new RelativeLayout(this);
+        RelativeLayout.LayoutParams relParentParam_main = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+        relParent_main.setLayoutParams(relParentParam_main);
+
+
+
         RelativeLayout relParent = new RelativeLayout(this);
-        RelativeLayout.LayoutParams relParentParam = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+        relParent.setId(View.generateViewId());
+
+        RelativeLayout.LayoutParams relParentParam = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         relParent.setLayoutParams(relParentParam);
+
 
         rajawaliSurface = new RajawaliSurfaceView(this);//view for 3D shape , object of
         //Rajawali class
@@ -456,10 +491,40 @@ public class MainActivity extends AppCompatActivity {
         param_right.addRule(RelativeLayout.RIGHT_OF,rajawaliSurface.getId());
         relParent.addView(gridLayout_right,param_right);//right grid
         //grid
-        setContentView(relParent,relParentParam);
+        //toolbar
+
+        Toolbar t = new Toolbar(this);
+        t.setId(View.generateViewId());
+        t.setBackgroundColor(Color.parseColor("#FF6200EE"));
+        t.setTitle("Drone Controller");
+        t.setTitleTextAppearance(this,R.style.Toolbar_TitleText);
+        t.setTitleTextColor(Color.WHITE);
+
+
+        RelativeLayout.LayoutParams tool_param = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        tool_param.addRule(RelativeLayout.ALIGN_PARENT_TOP,1);
+        t.setLayoutParams(tool_param);
+
+
+
+        //Right side button
+        ImageButton b1=new ImageButton(this);
+        b1.setBackground(getDrawable(R.drawable.setting_pic));
+
+        Toolbar.LayoutParams tool_but=new Toolbar.LayoutParams(Toolbar.LayoutParams.WRAP_CONTENT, Toolbar.LayoutParams.WRAP_CONTENT);
+        tool_but.gravity=Gravity.END;
+        tool_but.setMargins(5,2,2,2);
+        b1.setLayoutParams(tool_but);
+        t.addView(b1,tool_but);
+        //toolbar
+
+        relParent_main.addView(t,tool_param);
+        //relParent_main.addView(relParent,relParentParam);
+        setContentView(relParent_main,relParentParam_main);
 
 
     }
+
 
     public void onResume() {//for sensor
         super.onResume();
@@ -467,6 +532,7 @@ public class MainActivity extends AppCompatActivity {
             sensorManager.registerListener(gyroListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
 
         }
+
     }
 
     public void onStop() {
@@ -477,21 +543,31 @@ public class MainActivity extends AppCompatActivity {
     public OnScreenJoystickListener joystick_left_listener = new OnScreenJoystickListener()
     {
 
+
         @Override
         public void onTouch(final MotionEvent pEvent,OnScreenJoystick joystick, float pX, float pY) {
 
+                    pEvent_left = pEvent;
+                    pX_left = pX;
+                    pY_left = pY;
 
-                    d_new_y = joystick_left.distance_base(pEvent.getX());
+                    if(joystick.stop_flag == 1)
+                        resume_left_joystick =1;
+                    else
+                        resume_left_joystick = 0;
 
-                    int flag = 1;
-                    if(d_new_y < d_prev_y)
+
+                    if(pX < joystick_left.getx())
                     {
-                        flag = -1 ;
+                        flag_check_direction = -1;
                     }
-                    d_prev_y = d_new_y;
+                    else
+                        flag_check_direction = 1;
 
-                    double Vy =  flag * joystick.getStrength() * Math.abs(Math.cos(Math.toRadians(joystick.getAngle())));//yaw
+
+                    double Vy =  flag_check_direction * joystick.getStrength() * Math.abs(Math.cos(Math.toRadians(joystick.getAngle())));//yaw
                     // Calculate the angular speed of the sample
+
                     Log.d("----pX :",String.valueOf(Math.round(pX * 100.0) / 100.0));
 
                     Log.d("----cos of angle is :",String.valueOf(Math.cos(Math.toRadians(joystick.getAngle()))));
@@ -532,6 +608,30 @@ public class MainActivity extends AppCompatActivity {
                     SensorManager.getRotationMatrixFromVector(deltaRotationMatrix, deltaRotationVector);
                     renderer.Rotate(deltaRotationMatrix);
 
+                    //multiply
+                    Log.d("\n---yaw----rotation\n", Arrays.deepToString((yawRotationMatrix_save)));
+                    float[][] new_matrix = new float[3][3];
+                    int c=0;
+                    for(int a=0;a<3;a++)
+                    {
+                        for(int b=0;b<3;b++)
+                        {
+                            new_matrix[a][b] = deltaRotationMatrix[c];
+                            c = c + 1;
+                        }
+
+                    }
+                    float[][] product = new float[3][3];
+                    for(int i = 0; i < 3; i++) {
+                        for (int j = 0; j < 3; j++) {
+                            for (int k = 0; k < 3; k++) {
+                                product[i][j] += yawRotationMatrix_save[i][k] * new_matrix[k][j];
+                            }
+                        }
+                    }
+                    yawRotationMatrix_save = product;
+                     //multiply
+
                     //send pwm data
                     /// range 1500 - 2000 - 2500
                     // if cos or sin was negative > 1500 to 2000 . otherwise 2000 to 2500
@@ -556,9 +656,23 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onTouch(final MotionEvent pEvent,OnScreenJoystick joystick, float pX, float pY) {
             if (pEvent.getAction() == MotionEvent.ACTION_UP) {//when joystick is clicked
-                Quaternion q = new Quaternion(Math.sqrt(2)/2,0,Math.sqrt(2)/2,0);
 
-                renderer.Rotate_begin(q);
+
+                float[] one_dim_matrix = new float[9];
+                int count=0;
+                for(int i=0;i<3;i++)
+                {
+                    for(int j=0;j<3;j++)
+                    {
+                        one_dim_matrix[count] = yawRotationMatrix_save[i][j];
+                        count = count + 1;
+                    }
+                }
+                Log.d("\n---right----rotation\n", ((Arrays.toString(one_dim_matrix))));
+
+                renderer.Rotate_begin();
+                renderer.Rotate(one_dim_matrix);
+
                 prev_Vx = 0;
                 prev_Vz = 0;
 
@@ -638,9 +752,9 @@ public class MainActivity extends AppCompatActivity {
                 if (timestamp != 0) {
                     final float dT = (event.timestamp - timestamp) * NS2S;
                     // Axis of the rotation sample, not normalized yet.
-                    float axisX = event.values[1];
+                    float axisX = event.values[2];
                     float axisY = event.values[0];
-                    float axisZ = event.values[2];
+                    float axisZ = event.values[1];
 
 
                     // Calculate the angular speed of the sample
@@ -679,4 +793,30 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+    private class myThread extends Thread {
+
+        private boolean counter=true;
+
+        public void stopThread() throws InterruptedException {
+            counter = false;
+        }
+
+        @Override
+        public void run() {
+
+                while(counter) {
+                    if(resume_left_joystick == 1) {
+                        joystick_left_listener.onTouch(pEvent_left, joystick_left, pX_left, pY_left);
+                        try {
+                            sleep(50);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                //Do rest of your work
+
+
+        }
+    }
 }

@@ -51,6 +51,8 @@ public class OnScreenJoystick extends SurfaceView implements
     private long mLoopInterval = 50;
     private JoystickThread mThread;
 
+    public int stop_flag = 1;//for resuming rotatation for left joystick
+
     private float mKnobX, mKnobY,mKnobX1, mKnobY1;
     private float mKnobSize;
     private float mBackgroundSize,mBackgroundwidth;
@@ -171,40 +173,57 @@ public class OnScreenJoystick extends SurfaceView implements
         pCanvas.drawCircle(mKnobX ,mKnobY,mRadius,colors);
     }
 
-
+    public float getx()
+    {
+        return mKnobX1;
+    }
+    public float gety()
+    {
+        return mKnobY1;
+    }
 
     @Override
     public boolean onTouch(final View arg0, final MotionEvent pEvent) {
         final float x = pEvent.getX();
         final float y = pEvent.getY();
 
-        if (pEvent.getAction() == MotionEvent.ACTION_UP) {//when joystick is clicked
-            if (isAutoCentering()) {//position of two circles center
-                mKnobX = mBackgroundwidth * 0.5f;
-                mKnobY = mBackgroundSize * 0.5f;
+
+            if (pEvent.getAction() == MotionEvent.ACTION_UP)
+                {//when joystick is clicked
+                if (isAutoCentering()) {//position of two circles center
+                    mKnobX = mBackgroundwidth * 0.5f;
+                    mKnobY = mBackgroundSize * 0.5f;
+                    stop_flag = 0;
+                }
+
+                } else {
+                stop_flag = 1;
+                float displacement = (float) Math.sqrt(Math.pow(x - mKnobX1, 2) + Math.pow(y - mKnobY1, 2));
+                if (displacement < baseradius) {
+                    mKnobX = x;
+                    mKnobY = y;
+                } else {
+
+                    float ratio = baseradius / displacement;
+                    mKnobX = (mKnobX1 + (x - mKnobX1) * ratio);
+                    mKnobY = (mKnobY1 + (y - mKnobY1) * ratio);
+                }
+
             }
-        } else {
-            float displacement = (float) Math.sqrt(Math.pow(x - mKnobX1, 2) + Math.pow(y - mKnobY1, 2));
-            if (displacement < baseradius) {
-                mKnobX = x;
-                mKnobY = y;
-            } else {
 
-                float ratio = baseradius / displacement;
-                mKnobX = (mKnobX1 + (x - mKnobX1) * ratio);
-                mKnobY = (mKnobY1 + (y - mKnobY1) * ratio);
+            if (mJoystickListener != null) {
+                mJoystickListener.onTouch(pEvent, this,
+                        mKnobX,
+                        mKnobY);
+
             }
-        }
-
-        if (mJoystickListener != null) {
-            mJoystickListener.onTouch(pEvent,this,
-                    (0.5f - (mKnobX / (mRadius * 2 - mKnobSize))) * -2,
-                    (0.5f - (mKnobY / (mRadius * 2 - mKnobSize))) * 2);
-
-        }
+            //up=1,down=0,move=2
+        //Toast.makeText(getContext(),String.valueOf(pEvent.getAction()),Toast.LENGTH_SHORT).show();
 
         return true;
-    }
+        }
+
+
     /**
      * Process the angle following the 360° counter-clock protractor rules.
      * @return the angle of the button
@@ -259,7 +278,7 @@ public class OnScreenJoystick extends SurfaceView implements
                         doDraw(canvas);
                     }
                 }
-                catch(Exception e){}
+                catch(Exception ignored){}
                 finally {
                     if (canvas != null) {
                         mHolder.unlockCanvasAndPost(canvas);

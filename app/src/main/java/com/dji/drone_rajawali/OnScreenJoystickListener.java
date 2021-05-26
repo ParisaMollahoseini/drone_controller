@@ -31,5 +31,5 @@ public interface OnScreenJoystickListener {
      * @param pX The x coordinate of the knob. Values are between -1 (left) and 1 (right).
      * @param pY The y coordinate of the knob. Values are between -1 (down) and 1 (up).
      */
-    public void onTouch(final MotionEvent pEvent,final OnScreenJoystick joystick, final float pX, final float pY);
+    void onTouch(final MotionEvent pEvent,final OnScreenJoystick joystick, final float pX, final float pY);
 }
