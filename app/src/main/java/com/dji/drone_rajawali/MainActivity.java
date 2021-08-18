@@ -7,6 +7,7 @@ import androidx.core.content.res.ResourcesCompat;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -55,6 +56,7 @@ import static java.lang.Math.sqrt;
 
 // y >> z
 // x >> y
+
 // z >> x
 
 public class MainActivity extends AppCompatActivity {
@@ -138,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
 
         RelativeLayout.LayoutParams relParentParam = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         relParent.setLayoutParams(relParentParam);
+
 
 
         rajawaliSurface = new RajawaliSurfaceView(this);//view for 3D shape , object of
@@ -510,16 +513,32 @@ public class MainActivity extends AppCompatActivity {
         //Right side button
         ImageButton b1=new ImageButton(this);
         b1.setBackground(getDrawable(R.drawable.setting_pic));
-
+        b1.setScaleX(1.5f);
+        b1.setScaleY(1.5f);
         Toolbar.LayoutParams tool_but=new Toolbar.LayoutParams(Toolbar.LayoutParams.WRAP_CONTENT, Toolbar.LayoutParams.WRAP_CONTENT);
         tool_but.gravity=Gravity.END;
-        tool_but.setMargins(5,2,2,2);
+        tool_but.setMargins(5,5,10,5);
         b1.setLayoutParams(tool_but);
         t.addView(b1,tool_but);
-        //toolbar
+        //intent
+        Intent intent = new Intent(this,SettingsActivity.class);
 
+
+        b1.setOnClickListener(new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+
+                        startActivity(intent);
+
+                    }
+                });
+        //intent
+
+        //toolbar
+        relParentParam.addRule(RelativeLayout.BELOW,t.getId());
         relParent_main.addView(t,tool_param);
-        //relParent_main.addView(relParent,relParentParam);
+        relParent_main.addView(relParent,relParentParam);
         setContentView(relParent_main,relParentParam_main);
 
 
